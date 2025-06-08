@@ -5,7 +5,10 @@ const Heading = (props) => (
 )
 
 const StatisticLine = (props) => (
-  <div> {props.text} {props.value}</div>
+  <tr>
+    <td>{props.text}</td> 
+    <td>{props.value}</td>
+  </tr>
 )
 const Button = (props) => (
   <button onClick={props.onClick}> {props.text}</button>
@@ -18,14 +21,16 @@ const Statistics = ({good,bad,neutral}) => {
     )
   }
   return (
-  <>
-  <StatisticLine text ="good" value ={good}/>
-  <StatisticLine text ="neutral" value ={neutral}/>
-  <StatisticLine text ="bad" value ={bad}/>
-  <StatisticLine text ="all" value ={good + bad + neutral}/>
-  <StatisticLine text ="average" value ={good + bad + neutral / 3}/>
-  <StatisticLine text ="positive" value ={good / (good + bad + neutral) * 100 + " %"}/>
-  </>
+  <table>
+    <tbody>
+      <StatisticLine text ="good" value ={good}/>
+      <StatisticLine text ="neutral" value ={neutral}/>
+      <StatisticLine text ="bad" value ={bad}/>
+      <StatisticLine text ="all" value ={good + bad + neutral}/>
+      <StatisticLine text ="average" value ={good + bad + neutral / 3}/>
+      <StatisticLine text ="positive" value ={good / (good + bad + neutral) * 100 + " %"}/>
+    </tbody>
+  </table>
   )
 }
 const App = () => {
