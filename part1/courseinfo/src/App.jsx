@@ -4,10 +4,9 @@ const Heading = (props) => (
   <h1> {props.text} </h1>
 )
 
-const Display = (props) => (
-  <div> {props.text} {props.state}</div>
+const StatisticLine = (props) => (
+  <div> {props.text} {props.value}</div>
 )
-
 const Button = (props) => (
   <button onClick={props.onClick}> {props.text}</button>
 )
@@ -20,12 +19,12 @@ const Statistics = ({good,bad,neutral}) => {
   }
   return (
   <>
-  <Display text ="good" state ={good}/>
-  <Display text ="neutral" state ={neutral}/>
-  <Display text ="bad" state ={bad}/>
-  <Display text ="all" state ={good + bad + neutral}/>
-  <Display text ="average" state ={good + bad + neutral / 3}/>
-  <Display text ="positive" state ={good / (good + bad + neutral) * 100 + " %"}/>
+  <StatisticLine text ="good" value ={good}/>
+  <StatisticLine text ="neutral" value ={neutral}/>
+  <StatisticLine text ="bad" value ={bad}/>
+  <StatisticLine text ="all" value ={good + bad + neutral}/>
+  <StatisticLine text ="average" value ={good + bad + neutral / 3}/>
+  <StatisticLine text ="positive" value ={good / (good + bad + neutral) * 100 + " %"}/>
   </>
   )
 }
