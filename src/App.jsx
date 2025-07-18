@@ -1,30 +1,9 @@
 import { useState , useEffect } from 'react'
-import axios from 'axios'
+import services from './services/services'
+import PersonForm from './components/PersonForm'
+import Filter from './components/Filter'
+import Persons from './components/Persons'
 
-const Filter = (props) => {
-
-  return (
-  <div>
-    filter shown with <input value={props.search} onChange={props.onChange} />
-  </div>
-  )
-}
-
-const PersonForm = (props) => {
-    return (
-      <form>
-        <div>
-          name: <input value={props.newName} onChange={props.handleChange}/>
-        </div>
-        <div>
-          number: <input value={props.phoneNumber} onChange={props.handlePhoneNumber}/></div>
-        <div>
-          <button type="submit" onClick={props.handleClick}>add</button>
-        </div>
-      </form>
-    )
-}
-const Persons = ({peopleToShow}) => peopleToShow.map(person => <p key={person.name}>{person.name} {person.number}</p>)
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
@@ -32,10 +11,11 @@ const App = () => {
   const [search, setSearch] = useState('')
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then(response => {
-      setPersons(response.data)
+    services.getAll().then(data => {
+      setPersons(data)
     })
   },[])
+
   const handleSearch = (e) => {
     console.log(e.target.value);
     setSearch(e.target.value)
@@ -51,28 +31,57 @@ const App = () => {
     setNewName(e.target.value)
   }
 
+  const confirmDelete = (person) => {
+    if (window.confirm(`Delete ${person.name}?`)){
+      handleDelete(person.id)
+    }
+  }
+  const handleDelete = (id) => {
+    services.deletePerson(id).then(data => {
+      console.log(data)
+      setPersons(persons.filter(person => person.id !== id))
+      }
+    )
+  }
+
   const handleClick = (e) => {
     e.preventDefault()
     if (persons.some(person => person.name === newName)){
-      alert(`${newName} is already added to phonebook`)
-      console.log("dfsdf")
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)){
+        const person = persons.find(p => p.name === newName)
+        const updatedPerson = {...person, number: phoneNumber}
+
+        services.update( person.id, updatedPerson).then(data =>
+          console.log(data)
+        )
+      }
+      
     } else{
       const person = {name: newName, number: phoneNumber}
-      setPersons(persons.concat(person))
-      setNewName('')
+      services.create(person).then(newPerson => {
+        setPersons(persons.concat(newPerson))
+        setNewName('')
+        setPhoneNumber('')
+      })
     }
   }
-  const peopleToShow = persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
+  const peopleToShow = persons.filter(person => 
+    person.name.toLowerCase().includes(search.toLowerCase()))
+  
   return (
     <div>
       <h2>Phonebook</h2>
       <Filter search={search} onChange={handleSearch}/>
       <h2>Add a new</h2>
-      <PersonForm handleClick={handleClick} newName={newName} phoneNumber={phoneNumber} handleChange={handleChange} handlePhoneNumber={handlePhoneNumber} />
+      <PersonForm handleClick={handleClick} 
+        newName={newName} 
+        phoneNumber={phoneNumber} 
+        handleChange={handleChange} 
+        handlePhoneNumber={handlePhoneNumber} 
+      />
       <h2>Numbers</h2>
-      <Persons peopleToShow={peopleToShow}/>
+      <Persons peopleToShow={peopleToShow} confirmDelete={confirmDelete}/>
     </div>
   )
 }
-
 export default App
