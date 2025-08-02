@@ -1,9 +1,12 @@
 const express = require('express')
 const morgan = require('morgan')
+const mongoose = require('mongoose')
 const app = express()
 
 morgan.token('data', function (req, res) { return JSON.stringify(req.body) })
 
+app.use(mongoose)
+app.use(express.static('dist'))
 app.use(express.json())
 app.use(morgan(':method :url :status :res[Content-Length] :response-time ms :data'))
 
@@ -48,9 +51,6 @@ app.get('/api/persons/:id',(req, res) => {
     res.json(person)
 })
 
-app.get('/info', (req, res) => {
-    res.send(`<p>Phonebook has info for ${notes.length} people</p><p>${Date()}</p>`)
-})
 
 app.delete('/api/persons/:id', (req, res) => {
     const id = req.params.id
@@ -74,16 +74,10 @@ app.post('/api/persons', (req, res) => {
         return res.status(400).send({ error: '${body.name} already added to phonebook'})
     }
     persons = persons.concat(person)
-    res.status(200).end()
+    res.json(person).status(200).end()
 })
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
-}
-
-app.use(unknownEndpoint)
-
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`)
 })
