@@ -1,0 +1,6 @@
+PUT http://localhost:3001/api/notes/688f61d3867f33f521a6e14f
+
+{
+    "content" :"postman is good at testing",
+    "important" : false
+}
