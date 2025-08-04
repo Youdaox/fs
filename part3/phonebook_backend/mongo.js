@@ -17,17 +17,17 @@ const createPerson = (name, number) => {
   const Person = mongoose.model('Person', personSchema)
 
   const person = new Person({
-    "name": name,
-    "number": number,
+    'name': name,
+    'number': number,
   })
 
   person.save().then(res => {
-    console.log(res);
+    console.log(res)
     mongoose.connection.close()
   })
 }
 
-const printAll = async (password) => {
+const printAll = async () => {
   const personSchema = new mongoose.Schema({
     name: String,
     number: String,
@@ -37,11 +37,11 @@ const printAll = async (password) => {
   const Person = mongoose.model('Person', personSchema)
 
   Person.find({}).then(res => {
-    console.log("phonebook:");
+    console.log('phonebook:')
     res.forEach(person => {
-      console.log(person.name, person.number);
+      console.log(person.name, person.number)
     })
-     mongoose.connection.close()
+    mongoose.connection.close()
   })
 }
 
