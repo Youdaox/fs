@@ -1,0 +1,23 @@
+# Ignore environment files in all subdirectories
+**/.env
+
+# Ignore node_modules in all subdirectories
+**/node_modules/
+
+# Ignore build outputs in all subdirectories
+**/dist/
+**/dist-ssr/
+
+# Ignore local config files
+**/*.local
+
+# Editor directories and files
+**/.vscode/
+!.vscode/extensions.json
+**/.idea/
+**/.DS_Store
+**/*.suo
+**/*.ntvs*
+**/*.njsproj
+**/*.sln
+**/*.sw?
