@@ -16,6 +16,7 @@ beforeEach(async () => {
   ]
   await Blog.insertMany(initialBlogs)
 })
+
 test('returns all blogs', async () => {
     const blogs = await api.get('/api/blogs')
     
@@ -90,6 +91,40 @@ test('verifies the title or url properties is in request', async () => {
     .expect(500)
 })
 
+test('blog post can be deleted', async () => {
+  let blogs = await Blog.find({})
+  blogs = blogs.map(blog => blog.toJSON())
+  const blogToDelete = blogs[0]
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const endBlogs = await Blog.find({})
+
+  assert.strictEqual(blogs.length -1 , endBlogs.length)
+})
+
+test('blog post can be updated', async () => {
+  let blogs = await Blog.find({})
+  blogs = blogs.map(blog => blog.toJSON())
+  const blogToUpdate = blogs[0]
+
+  const updatedBlog = {
+    title: "third blog",
+    author: "ryanl",
+    url: "http://localhost:3003/api/blogs",
+    likes: 31,
+}
+  await api.put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlog)
+    .expect(201)
+
+  let endBlogs = await Blog.find({})
+  endBlogs = endBlogs.map(b => b.toJSON())
+  
+  
+  assert.strictEqual(endBlogs[1].likes, updatedBlog.likes)
+})
 after(async () => {
   await mongoose.connection.close()
 })
