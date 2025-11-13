@@ -1,22 +1,31 @@
 const BlogRouter = require('express').Router()
 const Blog = require('../models/Blog')
+const User = require('../models/User')
 
 BlogRouter.get('/api/blogs', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).populate('user', { name: 1, username: 1})
   response.json(blogs)
 })
 
 BlogRouter.post('/api/blogs', async (request, response) => {
   const body = request.body
+  const user = await User.findOne({})
   
+  if (!user) {
+    return response.status(400).json({ error: 'userId missing or not valid' })
+  }
+
   const blog = new Blog({
       title: body.title,
       author: body.author,
+      user: user._id,
       url: body.url,
       likes: body.likes || 0,
   })
 
   const result = await blog.save()
+  user.blogs = user.blogs.concat(result._id)
+  await user.save()
   response.status(201).json(result)
 })
 
@@ -27,6 +36,7 @@ BlogRouter.put('/api/blogs/:id', async (request, response) => {
   const blog = new Blog({
     title: body.title,
     author: body.author,
+    user: user._id,
     url: body.url,
     likes: body.likes || 0,
   })

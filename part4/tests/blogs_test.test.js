@@ -5,17 +5,20 @@ const supertest = require('supertest')
 const mongoose = require('mongoose')
 const app = require('../app')
 const Blog = require('../models/Blog')
+const User = require('../models/User')
 
 const api = supertest(app)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
   const initialBlogs = [
     { title: 'Blog 1', author: 'Author 1', url: 't', likes: 5 },
     { title: 'Blog 2', author: 'Author 2', url: 's', likes: 10 },
   ]
   await Blog.insertMany(initialBlogs)
 })
+
 
 test('returns all blogs', async () => {
     const blogs = await api.get('/api/blogs')
@@ -113,7 +116,7 @@ test('blog post can be updated', async () => {
     title: "third blog",
     author: "ryanl",
     url: "http://localhost:3003/api/blogs",
-    likes: 31,
+    likes: 3,
 }
   await api.put(`/api/blogs/${blogToUpdate.id}`)
     .send(updatedBlog)
@@ -124,6 +127,56 @@ test('blog post can be updated', async () => {
   
   
   assert.strictEqual(endBlogs[1].likes, updatedBlog.likes)
+})
+
+test('users with an invalid password are not created', async () => {
+  const initialUsers  = await User.find({})
+  const user = 
+    {
+      name: 'test post',
+      username: 'john'
+    }
+
+  const user1 = 
+    {
+      name: 'test post',
+      username: 'john',
+      password: 'ab'
+    }
+
+  const result = await api.post('/api/users')
+    .send(user)
+    .expect(400)
+  
+  await api.post('/api/users')
+    .send(user1)
+    .expect(400)
+
+  const endUsers = await User.find({})
+  assert(result.body.error.includes('password missing or too short'))
+  assert.strictEqual(initialUsers.length, (endUsers.length))
+})
+test('users with the same username are not created', async () => {
+  const initialUsers  = await User.find({})
+  const user = 
+    {
+      name: 'test post',
+      username: 'john',
+      password: 'abc'
+    }
+
+
+  await api.post('/api/users')
+    .send(user)
+    .expect(201)
+  
+  const result = await api.post('/api/users')
+    .send(user)
+    .expect(400)
+
+  const endUsers = await User.find({})
+  assert(result.body.error.includes('expected `username` to be unique'))
+  assert.strictEqual(endUsers.length, 1)
 })
 after(async () => {
   await mongoose.connection.close()
