@@ -12,11 +12,23 @@ const api = supertest(app)
 beforeEach(async () => {
   await Blog.deleteMany({})
   await User.deleteMany({})
-  const initialBlogs = [
-    { title: 'Blog 1', author: 'Author 1', url: 't', likes: 5 },
-    { title: 'Blog 2', author: 'Author 2', url: 's', likes: 10 },
-  ]
-  await Blog.insertMany(initialBlogs)
+  const blog = { title: 'Blog 1', author: 'Author 1', url: 't', likes: 5 }
+  
+  await api.post('/api/users').send({
+      name: 'firstuser',
+      username: 'firstuser',
+      password: 'testpass'
+    })
+  const login = await api.post('/api/login')
+  .send({
+    username: 'firstuser',
+    password: 'testpass'
+  })
+
+  await api.post('/api/blogs')
+    .send(blog)
+    .set('authorization', 'Bearer ' + login.body.token)
+  
 })
 
 
@@ -24,7 +36,7 @@ test('returns all blogs', async () => {
     const blogs = await api.get('/api/blogs')
     
 
-    assert.strictEqual(blogs.body.length, 2)
+    assert.strictEqual(blogs.body.length, 1)
 })
 
 test('unique identifier property is named id', async () => {
@@ -43,16 +55,45 @@ test('successfully creates a new blog post', async () => {
       url: 'link',
       likes: 5,
     }
-  
+
+  const login = await api.post('/api/login')
+  .send({
+    username: 'firstuser',
+    password: 'testpass'
+  })
 
   await api.post('/api/blogs')
     .send(blog)
+    .set('authorization', 'Bearer ' + login.body.token)
     .expect(201)
     .expect('Content-Type', /application\/json/)
   
   const endBlogs = await Blog.find({})
 
   assert.strictEqual(initialBlogs.length + 1, (endBlogs.length))
+})
+
+test('verifies new blog post fails when token is missing', async () => {
+  const blog = 
+    {
+      title: 'test post',
+      author: 'john',
+      url: 'link',
+      likes: 5,
+    }
+
+  const login = await api.post('/api/login')
+  .send({
+    username: 'firstuser',
+    password: 'testpass'
+  })
+
+  await api.post('/api/blogs')
+    .send(blog)
+    .set('authorization', '')
+    .expect(401)
+    .expect('Content-Type', /application\/json/)
+  
 })
 
 test('verifies the likes property is in request', async () => {
@@ -63,8 +104,15 @@ test('verifies the likes property is in request', async () => {
       url: 'link',
     }
 
+  const login = await api.post('/api/login')
+  .send({
+    username: 'firstuser',
+    password: 'testpass'
+  })
+
   await api.post('/api/blogs')
     .send(blog)
+    .set('authorization', 'Bearer ' + login.body.token)
     .expect(201)
     .expect('Content-Type', /application\/json/)
   
@@ -85,12 +133,20 @@ test('verifies the title or url properties is in request', async () => {
       author: 'john',
       likes: 5
     }
+  const login = await api.post('/api/login')
+  .send({
+    username: 'firstuser',
+    password: 'testpass'
+  })
+  
   await api.post('/api/blogs')
     .send(blog)
+    .set('authorization', 'Bearer ' + login.body.token)
     .expect(500)
 
   await api.post('/api/blogs')
     .send(blog1)
+    .set('authorization', 'Bearer ' + login.body.token)
     .expect(500)
 })
 
@@ -99,7 +155,14 @@ test('blog post can be deleted', async () => {
   blogs = blogs.map(blog => blog.toJSON())
   const blogToDelete = blogs[0]
 
+  const login = await api.post('/api/login')
+  .send({
+    username: 'firstuser',
+    password: 'testpass'
+  })
+
   await api.delete(`/api/blogs/${blogToDelete.id}`)
+    .set('authorization', 'Bearer ' + login.body.token)
     .expect(204)
 
   const endBlogs = await Blog.find({})
@@ -117,9 +180,17 @@ test('blog post can be updated', async () => {
     author: "ryanl",
     url: "http://localhost:3003/api/blogs",
     likes: 3,
-}
+  }
+
+  const login = await api.post('/api/login')
+  .send({
+    username: 'firstuser',
+    password: 'testpass'
+  })
+
   await api.put(`/api/blogs/${blogToUpdate.id}`)
     .send(updatedBlog)
+    .set('authorization', 'Bearer ' + login.body.token)
     .expect(201)
 
   let endBlogs = await Blog.find({})
@@ -176,7 +247,7 @@ test('users with the same username are not created', async () => {
 
   const endUsers = await User.find({})
   assert(result.body.error.includes('expected `username` to be unique'))
-  assert.strictEqual(endUsers.length, 1)
+  assert.strictEqual(endUsers.length, 2)
 })
 after(async () => {
   await mongoose.connection.close()

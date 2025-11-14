@@ -14,7 +14,7 @@ BlogRouter.post('/', middleware.userExtractor, async (request, response) => {
   const user = request.user
 
   if (!user) {
-    return response.status(400).json({ error: 'userId missing or not valid' })
+    return response.status(401).json({ error: 'userId missing or not valid' })
   }
 
   const blog = new Blog({
@@ -31,11 +31,20 @@ BlogRouter.post('/', middleware.userExtractor, async (request, response) => {
   response.status(201).json(result)
 })
 
-BlogRouter.put('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
+BlogRouter.put('/:id', middleware.userExtractor, async (request, response) => {
+  const user = request.user
+
+  if (!user) {
+    return response.status(401).json({ error: 'userId missing or not valid' })
+  }
+  const blog = await Blog.findById(request.params.id)
+
+  if (!(blog.user.toString() === user.id.toString())) {
+    return response.status(401).json({ error: 'not authorized' })
+  }
   const body = request.body
 
-  const blog = new Blog({
+  const updatedBlog = new Blog({
     title: body.title,
     author: body.author,
     user: user._id,
@@ -43,7 +52,7 @@ BlogRouter.put('/:id', async (request, response) => {
     likes: body.likes || 0,
   })
 
-  const result = await blog.save()
+  const result = await updatedBlog.save()
   response.status(201).json(result)
 })
 
@@ -54,7 +63,7 @@ BlogRouter.delete('/:id', middleware.userExtractor, async (request, response) =>
     return response.status(401).json({ error: 'invalid token' })
   }
   const blog = await Blog.findById(request.params.id)
-  
+
   if (!(blog.user.toString() === user.id.toString())) {
     return response.status(401).json({ error: 'only the author can delete' })
   }
