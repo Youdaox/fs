@@ -22,7 +22,7 @@ mongoose
 app.use(express.json())
 app.use(middleware.getToken)
 
-app.use('', BlogRouter)
+app.use('/api/blogs', BlogRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
 
