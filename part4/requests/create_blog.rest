@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzc2RmIiwiaWQiOiI2OTE1NzVlZGEzZmFlMjhlOWJhOWZlMDgiLCJpYXQiOjE3NjMwOTMyODF9.pqBsu3OSboA3E7Orta-iw834ltIMJ5x5XNYk-b9_myk
 
 {
   "title": "second blog",

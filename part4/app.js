@@ -6,6 +6,8 @@ const middleware = require('./utils/middleware')
 
 const BlogRouter = require('./controllers/blog')
 const userRouter = require('./controllers/user')
+const loginRouter = require('./controllers/login')
+
 const app = express()
 
 mongoose
@@ -18,9 +20,11 @@ mongoose
   })
   
 app.use(express.json())
+app.use(middleware.getToken)
 
 app.use('', BlogRouter)
 app.use('/api/users', userRouter)
+app.use('/api/login', loginRouter)
 
 app.use(middleware.errorHandler)
 
