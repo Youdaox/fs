@@ -31,25 +31,28 @@ BlogRouter.post('/', middleware.userExtractor, async (request, response) => {
   response.status(201).json(result)
 })
 
-BlogRouter.put('/:id', middleware.userExtractor, async (request, response) => {
-  const user = request.user
+BlogRouter.put('/:id', async (request, response) => {
+  const blogToUpdate = request.body
 
-  if (!user) {
+  if (!blogToUpdate.user) {
     return response.status(401).json({ error: 'userId missing or not valid' })
   }
   const blog = await Blog.findById(request.params.id)
 
-  if (!(blog.user.toString() === user.id.toString())) {
+  if (!(blog.user.toString() === blogToUpdate.user.id.toString())) {
     return response.status(401).json({ error: 'not authorized' })
   }
-  const body = request.body
+  console.log(blogToUpdate.user)
+  const id = blog._id
+  await Blog.findByIdAndDelete(id)
 
   const updatedBlog = new Blog({
-    title: body.title,
-    author: body.author,
-    user: user._id,
-    url: body.url,
-    likes: body.likes || 0,
+    _id: id,
+    title: blogToUpdate.title,
+    author: blogToUpdate.author,
+    user: blogToUpdate.user.id,
+    url: blogToUpdate.url,
+    likes: blogToUpdate.likes || 0,
   })
 
   const result = await updatedBlog.save()

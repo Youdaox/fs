@@ -89,6 +89,25 @@ const App = () => {
     }
   }
 
+  const handleUpdateBlog = async (blog, id) => {
+    try {
+      await blogService.updateBlog(blog, id)
+      setNotificationType(true)
+      setMessage(`blog ${blog.title} updated`)
+      setTimeout(() => {
+          setMessage('')
+      }, 3000)
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
+    } catch {
+      setNotificationType(false)
+      setMessage('cannot update blog')
+      setTimeout(() => {
+          setMessage('')
+      }, 3000)
+    }
+  }
+
   const createFormRef = useRef()
   const createForm = () => (
     <Togglable buttonText="create blog" ref={createFormRef}>
@@ -97,6 +116,14 @@ const App = () => {
       />
     </Togglable>
   )
+
+  const handleDeleteBlog = async (blog) => {
+    const blogToDelete = blog
+    await blogService.deleteBlog(blog.id)
+    const newBlogs = blogs.filter(b => (b !== blogToDelete))
+    setBlogs(newBlogs)
+  }
+
   return (
     <div>
       {message && Notification(notificationType, message)}
@@ -107,8 +134,17 @@ const App = () => {
           <p>{user.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
             {createForm()}
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+          {blogs.sort((a, b) => b.likes - a.likes).map(blog => {
+            return (
+              <Blog 
+                key={blog.id} 
+                blog={blog} 
+                updateBlog={handleUpdateBlog} 
+                ownBlog={blog.user.username == user.username ? true : false}
+                deleteBlog={handleDeleteBlog}
+              />
+            )
+          }
           )}
         </div>
       )}

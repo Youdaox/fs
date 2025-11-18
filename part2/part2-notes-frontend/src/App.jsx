@@ -1,16 +1,17 @@
 import Note from './components/Note'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import noteService from './services/notes'
 import loginService from './services/login'
 
 import Notification from './components/Notification'
 import Footer from './components/Footer'
-import loginForm from './components/LoginForm'
-import noteForm from './components/NoteForm'
+import Togglable from './components/Togglable'
+import NoteForm from './components/NoteForm'
+
+import LoginForm from '../../../part5/bloglist-frontend/src/components/LoginForm'
 
 const App = () => {
   const [notes, setNotes] = useState([])
-  const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('') 
@@ -33,25 +34,7 @@ const App = () => {
       noteService.setToken(user.token)
     }
   }, [])
-  
-  const addNote = (event) => {
-    event.preventDefault()
-    const noteObject = {
-      content: newNote,
-      important: Math.random() < 0.5,
-      id: String(notes.length + 1),
-    }
 
-    noteService.create(noteObject).then(returnedNote => {
-      setNotes(notes.concat(returnedNote))
-      setNewNote('')
-    })
-  }
-
-  const handleNoteChange = (event) => {
-    console.log(event.target.value);
-    setNewNote(event.target.value)
-  }
 
   const notesToShow = showAll ? notes : notes.filter(note => note.important === true)
 
@@ -95,18 +78,46 @@ const App = () => {
     setUser(null)
     noteService.setToken(null)
   }
+
+  const addNote = (note) => {
+    noteFormRef.current.toggle()
+    noteService.create(note)
+      .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+      })
+  }
+
+  const loginForm = () => (
+    <Togglable buttonText="log in">
+      <LoginForm 
+        username={username}
+        password={password}
+        setUsername={setUsername}
+        setPassword={setPassword}
+        handleLogin={handleLogin}
+      />
+    </Togglable>
+  )
+  
+  const noteFormRef = useRef()
+
+  const noteForm = () => (
+  <Togglable buttonText="add note" ref={noteFormRef}>
+    <NoteForm 
+      createNote={addNote}
+    />
+  </Togglable>
+  )
   return (
     <div>
       <h1>Notes</h1>
       <Notification message={errorMessage}/>
 
-      <h2>Login</h2>
-
-      {!user && loginForm(handleLogin, username, setUsername, password, setPassword)}
+      {!user && loginForm()}
       {user && (
         <div>
           <p>{user.name} logged in</p>
-          {noteForm(addNote, newNote, handleNoteChange)}
+            {noteForm()}
           <button onClick={handleLogout}>logout</button>
         </div>
       )}

@@ -28,3 +28,15 @@ h1 {
   padding: 10px;
   margin-bottom: 10px;
 }
+
+.blog {
+  border-style: solid;
+  margin: 0.4vw;
+  padding: 10px;
+}
+
+.blogDetail {
+  border-style: solid;
+  margin: 0.4vw;
+  padding: 0 10px;
+}
