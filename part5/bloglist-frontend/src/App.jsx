@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import CreateForm from './components/CreateForm'
 import Notification from './components/Notification'
-
+import Togglable from './components/Togglabe'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -12,9 +12,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   const [message, setMessage] = useState('')
   const [notificationType, setNotificationType] = useState(true)
@@ -72,35 +69,34 @@ const App = () => {
     setPassword
   }
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault()
-
+  const handleCreateBlog = async (blog) => {
     try {
-      await blogService.createBlog({title, author, url})
+      await blogService.createBlog(blog)
+      createFormRef.current.toggle()
       setNotificationType(true)
-      setMessage(`a new blog ${title} added`)
+      setMessage(`a new blog ${blog.title} added`)
       setTimeout(() => {
-        setMessage('')
+          setMessage('')
       }, 3000)
-      setTitle('') 
-      setAuthor('')
-      setUrl('')
       const blogs = await blogService.getAll()
       setBlogs(blogs)
     } catch {
-      console.log('error')
+      setNotificationType(false)
+      setMessage('cannot add blog')
+      setTimeout(() => {
+          setMessage('')
+      }, 3000)
     }
   }
 
-  const CreateFormProps = {
-    handleCreateBlog, 
-    title, 
-    setTitle, 
-    author,
-    setAuthor,
-    url,
-    setUrl
-  }
+  const createFormRef = useRef()
+  const createForm = () => (
+    <Togglable buttonText="create blog" ref={createFormRef}>
+      <CreateForm
+        createBlog={handleCreateBlog}
+      />
+    </Togglable>
+  )
   return (
     <div>
       {message && Notification(notificationType, message)}
@@ -110,7 +106,7 @@ const App = () => {
           <h2>blogs</h2>
           <p>{user.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
-          {CreateForm(CreateFormProps)}
+            {createForm()}
           {blogs.map(blog =>
             <Blog key={blog.id} blog={blog} />
           )}
