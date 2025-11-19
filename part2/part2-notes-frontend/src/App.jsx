@@ -14,8 +14,8 @@ const App = () => {
   const [notes, setNotes] = useState([])
   const [showAll, setShowAll] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const App = () => {
       .getAll()
       .then(initialNotes => {
         setNotes(initialNotes)
-    })
+      })
   }, [])
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const App = () => {
   const toggleImportanceOf = (id) => {
     const note = notes.find(n => n.id === id)
     const changedNote = { ...note, important: !note.important }
-    
+
     noteService.update(id, changedNote).then(returnedNote => {
       setNotes(notes.map(note => note.id === id ? returnedNote : note))
     }).catch(() => {
@@ -57,7 +57,7 @@ const App = () => {
 
   const handleLogin = async event => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
@@ -89,7 +89,7 @@ const App = () => {
 
   const loginForm = () => (
     <Togglable buttonText="log in">
-      <LoginForm 
+      <LoginForm
         username={username}
         password={password}
         setUsername={setUsername}
@@ -98,15 +98,15 @@ const App = () => {
       />
     </Togglable>
   )
-  
+
   const noteFormRef = useRef()
 
   const noteForm = () => (
-  <Togglable buttonText="add note" ref={noteFormRef}>
-    <NoteForm 
-      createNote={addNote}
-    />
-  </Togglable>
+    <Togglable buttonText="add note" ref={noteFormRef}>
+      <NoteForm
+        createNote={addNote}
+      />
+    </Togglable>
   )
   return (
     <div>
@@ -117,22 +117,22 @@ const App = () => {
       {user && (
         <div>
           <p>{user.name} logged in</p>
-            {noteForm()}
+          {noteForm()}
           <button onClick={handleLogout}>logout</button>
         </div>
       )}
-      <div> 
+      <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all'}
         </button>
       </div>
 
       <ul>
-        {notesToShow.map(note => 
+        {notesToShow.map(note =>
           <Note key={note.id} note={note} toggleImportance={() => toggleImportanceOf(note.id)}/>
         )}
       </ul>
-      
+
       <Footer />
     </div>
   )
