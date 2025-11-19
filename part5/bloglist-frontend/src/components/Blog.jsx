@@ -6,7 +6,7 @@ const Blog = ({ blog, updateBlog, ownBlog, deleteBlog }) => {
   const addLike = async () => {
     const updatedBlog = {
       title: blog.title,
-      author: blog.author, 
+      author: blog.author,
       url: blog.url,
       likes: blog.likes +1,
       user: blog.user
@@ -23,7 +23,7 @@ const Blog = ({ blog, updateBlog, ownBlog, deleteBlog }) => {
         <div>
           <p>{blog.title}
             <button onClick={() => setVisible(false)}> hide </button>
-          </p> 
+          </p>
           <p>{blog.url}</p>
           <p>{blog.author}</p>
           <p>likes {blog.likes}
@@ -44,7 +44,7 @@ const Blog = ({ blog, updateBlog, ownBlog, deleteBlog }) => {
       <div className="blogDetail">
         {visible && handleView()}
       </div>
-    </div>  
+    </div>
   )}
 
 export default Blog

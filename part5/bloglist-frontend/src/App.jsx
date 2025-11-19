@@ -45,7 +45,7 @@ const App = () => {
       setTimeout(() => {
         setMessage('')
       }, 3000)
-      setUsername('') 
+      setUsername('')
       setPassword('')
     } catch {
       setNotificationType(false)
@@ -62,10 +62,10 @@ const App = () => {
   }
 
   const LoginFormProps = {
-    handleLogin, 
-    username, 
-    setUsername, 
-    password, 
+    handleLogin,
+    username,
+    setUsername,
+    password,
     setPassword
   }
 
@@ -76,7 +76,7 @@ const App = () => {
       setNotificationType(true)
       setMessage(`a new blog ${blog.title} added`)
       setTimeout(() => {
-          setMessage('')
+        setMessage('')
       }, 3000)
       const blogs = await blogService.getAll()
       setBlogs(blogs)
@@ -84,7 +84,7 @@ const App = () => {
       setNotificationType(false)
       setMessage('cannot add blog')
       setTimeout(() => {
-          setMessage('')
+        setMessage('')
       }, 3000)
     }
   }
@@ -95,7 +95,7 @@ const App = () => {
       setNotificationType(true)
       setMessage(`blog ${blog.title} updated`)
       setTimeout(() => {
-          setMessage('')
+        setMessage('')
       }, 3000)
       const blogs = await blogService.getAll()
       setBlogs(blogs)
@@ -103,7 +103,7 @@ const App = () => {
       setNotificationType(false)
       setMessage('cannot update blog')
       setTimeout(() => {
-          setMessage('')
+        setMessage('')
       }, 3000)
     }
   }
@@ -133,14 +133,14 @@ const App = () => {
           <h2>blogs</h2>
           <p>{user.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
-            {createForm()}
+          {createForm()}
           {blogs.sort((a, b) => b.likes - a.likes).map(blog => {
             return (
-              <Blog 
-                key={blog.id} 
-                blog={blog} 
-                updateBlog={handleUpdateBlog} 
-                ownBlog={blog.user.username == user.username ? true : false}
+              <Blog
+                key={blog.id}
+                blog={blog}
+                updateBlog={handleUpdateBlog}
+                ownBlog={blog.user.username === user.username ? true : false}
                 deleteBlog={handleDeleteBlog}
               />
             )
