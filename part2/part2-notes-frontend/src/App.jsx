@@ -8,7 +8,7 @@ import Footer from './components/Footer'
 import Togglable from './components/Togglable'
 import NoteForm from './components/NoteForm'
 
-import LoginForm from '../../../part5/bloglist-frontend/src/components/LoginForm'
+import LoginForm from './components/LoginForm'
 
 const App = () => {
   const [notes, setNotes] = useState([])
@@ -79,13 +79,6 @@ const App = () => {
     noteService.setToken(null)
   }
 
-  const addNote = (note) => {
-    noteFormRef.current.toggle()
-    noteService.create(note)
-      .then(returnedNote => {
-        setNotes(notes.concat(returnedNote))
-      })
-  }
 
   const loginForm = () => (
     <Togglable buttonText="log in">
@@ -101,13 +94,20 @@ const App = () => {
 
   const noteFormRef = useRef()
 
+  const addNote = async (note) => {
+    noteFormRef.current.toggle()
+    await noteService.create(note)
+      .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+      })
+  }
+
   const noteForm = () => (
-    <Togglable buttonText="add note" ref={noteFormRef}>
-      <NoteForm
-        createNote={addNote}
-      />
+    <Togglable buttonText='add note' ref={noteFormRef}>
+      <NoteForm createNote={addNote} />
     </Togglable>
   )
+
   return (
     <div>
       <h1>Notes</h1>
@@ -116,7 +116,7 @@ const App = () => {
       {!user && loginForm()}
       {user && (
         <div>
-          <p>{user.name} logged in</p>
+          <p>{user.username} logged in</p>
           {noteForm()}
           <button onClick={handleLogout}>logout</button>
         </div>

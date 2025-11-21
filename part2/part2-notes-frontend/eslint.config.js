@@ -14,6 +14,7 @@ export default [
         vi: true,
         test: true,
         beforeEach: true,
+        require: true,
         ...globals.browser
       },
       parserOptions: {

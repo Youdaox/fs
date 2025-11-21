@@ -13,7 +13,7 @@ const loginForm = ({ handleLogin, username, setUsername, password, setPassword }
           <input type="text" value={password} onChange={(event) => setPassword(event.target.value)}></input>
         </label>
       </div>
-      <button type="submit">submit</button>
+      <button type="submit">login</button>
     </form>
   </div>
 )
