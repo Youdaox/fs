@@ -22,16 +22,19 @@ const CreateForm = ({ createBlog }) => {
           text="title:"
           value={title}
           setValue={setTitle}
+          data-testid="titleid"
         />
         <TextInput
           text="author:"
           value={author}
           setValue={setAuthor}
+          data-testid="authorid"
         />
         <TextInput
-          text="url::"
+          text="url:"
           value={url}
           setValue={setUrl}
+          data-testid="urlid"
         />
         <button type="submit">create</button>
       </form>
