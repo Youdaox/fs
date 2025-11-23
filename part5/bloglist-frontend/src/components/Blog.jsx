@@ -13,9 +13,10 @@ const Blog = ({ blog, updateBlog, ownBlog, deleteBlog }) => {
     }
     await updateBlog(updatedBlog, blog.id)
   }
-  const handleDelete = () => {
-    window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
-    deleteBlog(blog)
+  const handleDelete = async () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      await deleteBlog(blog)
+    }
   }
   const handleView = () => {
     return (
