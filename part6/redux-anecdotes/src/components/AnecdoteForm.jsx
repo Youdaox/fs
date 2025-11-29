@@ -11,7 +11,7 @@ const AnecdoteForm = () => {
     dispatch(changeMessage(`new note ${event.target.anecdote.value} created`))
     setTimeout(() => {
       dispatch(removeMessage())
-    }, 3000)
+    }, 5000)
     
     event.target.anecdote.value = ''
   }
